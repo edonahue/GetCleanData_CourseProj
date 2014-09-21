@@ -1,0 +1,16 @@
+{
+    "contents" : "# Download zip archive and unzip\ndownload.file(\"https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip\", \"UCI.zip\", method=\"curl\")\nunzip(\"UCI.zip\")\n# Read in x,y, and subject test data\nsetwd(\"UCI HAR Dataset/test\")\nxTest <- read.table(\"X_test.txt\")\nsubTest <- read.table(\"subject_test.txt\")\nyTest <- read.table(\"y_test.txt\")\n# Read in x,y, and subject training data\nsetwd(\"../train\")\nxTrain <- read.table(\"X_train.txt\")\nsubTrain <- read.table(\"subject_train.txt\")\nyTrain <- read.table(\"y_train.txt\")\n# Combine the training and test sets using rbind\nxFull <- rbind(xTrain, xTest)\nyFull <- rbind(yTrain, yTest)\nsubFull <- rbind(subTrain, subTest)\n\n# Limit variables returned to only mean or standard deviation measures\nf <- read.table(\"../features.txt\")\n\n# For mean variables I've chosen only those which seem to mean \n# mean measures of the related variable.  These all conveniently \n# have lower case \"mean()\" strings.  Note that this excludes\n# variables of the type \"meanFreq()\".\nmeanVars <- grep(\"mean\\\\(\\\\)\",f[,2],)\nstdVars <- grep(\"std\",f[,2])\n\n# mean and std variables are combined, with mean vars first, then std\nvars <- c(meanVars,stdVars)\n\n#Limit the variables of xFull to those selected with grep\ntidy <- xFull[,vars]\n\n# Add subject identifier to tidy dataset \ntidy$subject <- subFull[,1]\n#Read in activity descriptions and assign based on y values\na <- read.table(\"../activity_labels.txt\")\ntidy$activity <- a[yFull[,1],2]\n\n# Create and store variable names\n# Labels are created by substituting the hyphens with underscores and \n# deleting the \"()\".  This way the original descriptions can be copied\nvarNames <- gsub(\"-\",\"_\",f[vars,2])\nvarNames <- gsub(\"\\\\(\\\\)\",\"\",varNames)\nvarNames <- c(varNames,\"subject\",\"activity\")\n\n# Add names to the tidy set\nnames(tidy) <- varNames\n\n# Create an aggregated set with averages for all numeric values group\n# by activity and subject\ntidyAvg <- aggregate(tidy[,1:66],by=list(activity=tidy$activity, subject=tidy$subject), FUN=\"mean\")\nsetwd(\"../../\")\nwrite.table(tidyAvg, \"tidyAvg.txt\", row.name=FALSE)\n",
+    "created" : 1411323951003.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2093174455",
+    "id" : "5B40A7C7",
+    "lastKnownWriteTime" : 1411324487,
+    "path" : "~/Coursera/GetCleanData_CourseProj/run_analysis.R",
+    "project_path" : "run_analysis.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
